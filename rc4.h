@@ -3,7 +3,7 @@
 
 
 struct RC4_State {
-    char* S;
+    unsigned char* S;
     int i, j;
 };
 
@@ -17,7 +17,7 @@ char* ksa(char* key, int keylength) {
     }
 
     int j = 0;
-    char temp;
+    unsigned char temp;
     for (int i=0; i<256; i++) {
         j = (j + S[i] + key[i % keylength]) % 256;
 
@@ -43,11 +43,11 @@ struct RC4_State* new_rc4_state(char* key, int keylength) {
 }
 
 
-char pgra(struct RC4_State* state) {
+unsigned char pgra(struct RC4_State* state) {
     state->i = (state->i + 1) % 256;
-    state->j = (state->j + 1) % 256;
+    state->j = (state->j + state->S[state->i]) % 256;
 
-    char temp;
+    unsigned char temp;
     temp = state->S[state->i];
     state->S[state->i] = state->S[state->j];
     state->S[state->j] = temp;
@@ -56,7 +56,7 @@ char pgra(struct RC4_State* state) {
 }
 
 
-void encrypt(struct RC4_State* state, char* plaintext, int plaintext_len) {
+void encrypt(struct RC4_State* state, unsigned char* plaintext, int plaintext_len) {
     for (int i=0; i<plaintext_len; i++) {
         plaintext[i] = plaintext[i] ^ pgra(state);
     }
